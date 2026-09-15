@@ -218,7 +218,7 @@ fn main() {
                 }
             }
             #[cfg(windows)]
-            start_reminder(handle);
+            start_reminder(handle.clone());
             Ok(())
         })
         .run(tauri::generate_context!())

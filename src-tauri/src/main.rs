@@ -147,6 +147,9 @@ fn main() {
             if let WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();
                 let _ = window.hide();
+                if window.label() == "help" {
+                    let _ = window.app_handle().emit_to("main", "help-closed", ());
+                }
             }
         })
         .setup(|app| {

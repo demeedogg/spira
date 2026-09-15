@@ -1,5 +1,6 @@
 import { getCurrentWindow, PhysicalPosition } from "@tauri-apps/api/window";
 import { listen } from "@tauri-apps/api/event";
+import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import "./style.css";
 
 type PhaseKind = "inhale" | "hold" | "exhale" | "rest";
@@ -19,7 +20,6 @@ const orb = document.querySelector<HTMLSpanElement>("#orb")!;
 const countdown = document.querySelector<HTMLSpanElement>("#countdown")!;
 const leftNostril = document.querySelector<HTMLSpanElement>("#left-nostril")!;
 const rightNostril = document.querySelector<HTMLSpanElement>("#right-nostril")!;
-const help = document.querySelector<HTMLElement>("#help")!;
 
 let preset = PRESETS[0];
 let phaseIndex = 0;
@@ -31,6 +31,7 @@ let audioEnabled = false;
 let oscillator: OscillatorNode | undefined;
 let audioContext: AudioContext | undefined;
 let topmost = true;
+let helpPaused = false;
 const appWindow = getCurrentWindow();
 
 function loadPreference<T>(key: string, fallback: T): T {
@@ -58,7 +59,7 @@ function setPhase(index: number) {
 }
 
 function tick(now: number) {
-  if (!paused && !stopped && !help.classList.contains("hidden")) {
+  if (!paused && !stopped && !helpPaused) {
     const elapsed = (now - phaseStartedAt) / 1000;
     const remaining = currentPhase().seconds - elapsed;
     if (remaining <= 0) setPhase(phaseIndex + 1);
@@ -113,16 +114,27 @@ function updateAudio() {
   oscillator.start();
 }
 
-function toggleHelp() {
-  const opening = help.classList.contains("hidden");
-  help.classList.toggle("hidden");
-  if (opening && !paused && !stopped) { remainingWhenPaused = Math.max(1, currentPhase().seconds - (performance.now() - phaseStartedAt) / 1000); stopAudio(); }
-  if (!opening && !paused && !stopped) { phaseStartedAt = performance.now() - (currentPhase().seconds - remainingWhenPaused) * 1000; updateAudio(); }
+async function showHelp() {
+  if (!paused && !stopped) {
+    helpPaused = true;
+    remainingWhenPaused = Math.max(1, currentPhase().seconds - (performance.now() - phaseStartedAt) / 1000);
+    stopAudio();
+  }
+  const helpWindow = await WebviewWindow.getByLabel("help");
+  if (!helpWindow) return;
+  await helpWindow.show();
+  await helpWindow.setFocus();
+}
+
+function resumeFromHelp() {
+  if (!helpPaused) return;
+  helpPaused = false;
+  phaseStartedAt = performance.now() - (currentPhase().seconds - remainingWhenPaused) * 1000;
+  updateAudio();
 }
 
 document.addEventListener("keydown", async (event) => {
-  if (event.key === "?" || event.key === "F1") { event.preventDefault(); toggleHelp(); return; }
-  if (!help.classList.contains("hidden")) { if (event.key === "Escape") toggleHelp(); return; }
+  if (event.key === "?" || event.key === "F1") { event.preventDefault(); await showHelp(); return; }
   if (event.ctrlKey && event.key.toLowerCase() === "t") {
     topmost = !topmost;
     await appWindow.setAlwaysOnTop(topmost);
@@ -137,7 +149,6 @@ document.addEventListener("keydown", async (event) => {
   selectPreset(event.key);
 });
 
-document.querySelector("#close-help")!.addEventListener("click", toggleHelp);
 document.querySelector("#breath")!.addEventListener("click", togglePause);
 void listen<string>("tray-action", ({ payload }) => {
   if (payload === "pause") togglePause();
@@ -152,6 +163,7 @@ void listen<string>("tray-action", ({ payload }) => {
 void listen<string>("reminder-action", ({ payload }) => {
   if (payload === "start") { stopped = false; paused = false; setPhase(0); }
 });
+void listen("help-closed", resumeFromHelp);
 const savedPreset = loadPreference("preset", "1");
 const savedAudio = loadPreference("audio", false);
 const savedTopmost = loadPreference("topmost", true);

@@ -5,7 +5,10 @@
   "identifier": "app.spira.desktop",
   "build": { "beforeDevCommand": "npm run dev", "devUrl": "http://localhost:1420", "beforeBuildCommand": "npm run build", "frontendDist": "../dist" },
   "app": {
-    "windows": [{ "label": "main", "title": "spira", "width": 160, "height": 160, "minWidth": 160, "minHeight": 160, "maxWidth": 160, "maxHeight": 160, "x": 16, "y": 16, "decorations": false, "transparent": true, "alwaysOnTop": true, "skipTaskbar": true, "resizable": false, "visible": true }],
+    "windows": [
+      { "label": "main", "title": "spira", "width": 160, "height": 160, "minWidth": 160, "minHeight": 160, "maxWidth": 160, "maxHeight": 160, "x": 16, "y": 16, "decorations": false, "transparent": true, "alwaysOnTop": true, "skipTaskbar": true, "resizable": false, "visible": true },
+      { "label": "help", "title": "spira — scorciatoie", "url": "help.html", "width": 440, "height": 500, "center": true, "decorations": false, "resizable": false, "visible": false, "alwaysOnTop": true }
+    ],
     "security": { "csp": "default-src 'self'; style-src 'self' 'unsafe-inline';" }
   },
   "bundle": { "active": true, "targets": ["nsis"], "icon": ["icons/icon.ico"] }

@@ -14,8 +14,4 @@ body { user-select: none; }
 .nostril { position: absolute; top: 50%; z-index: 2; width: 7px; height: 7px; border-radius: 50%; background: rgba(244,251,255,.17); transform: translateY(-50%); transition: background .3s, box-shadow .3s; }
 .nostril.left { left: 18px; }.nostril.right { right: 18px; }
 .nostril.active { background: #f4fbff; box-shadow: 0 0 10px #f4fbff; }
-#help { position: fixed; inset: 0; display: grid; place-items: center; background: rgba(5,9,16,.67); backdrop-filter: blur(9px); z-index: 5; }
-#help.hidden { display: none; }
-.help-card { position: relative; width: min(420px, calc(100vw - 36px)); padding: 28px; border: 1px solid rgba(185,224,255,.22); border-radius: 22px; background: rgba(15,24,38,.96); box-shadow: 0 20px 70px rgba(0,0,0,.55); color: #eaf5ff; }
-.help-card h1 { margin: 0 0 18px; font-size: 25px; font-weight: 400; letter-spacing: -.04em; }.help-card dl { display: grid; grid-template-columns: 76px 1fr; gap: 9px 12px; margin: 0; }.help-card dt { color: #9bdfff; }.help-card dd { margin: 0; color: #c7d4e2; }.help-card p { margin: 22px 0 0; color: #96a7b7; font-size: 13px; line-height: 1.45; }.help-card button { position: absolute; top: 11px; right: 14px; border: 0; background: transparent; color: #c7d4e2; font-size: 27px; cursor: pointer; }
 @media (prefers-reduced-motion: reduce) { .orb, .nostril { transition-duration: .01ms; } }

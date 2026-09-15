@@ -1,0 +1,18 @@
+[package]
+name = "spira"
+version = "0.1.0"
+description = "A small breathing companion"
+authors = ["spira"]
+edition = "2021"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-autostart = "2"
+tauri-plugin-notification = "2"
+
+[target.'cfg(windows)'.dependencies]
+tauri-winrt-notification = "0.7"
+winreg = "0.10"
